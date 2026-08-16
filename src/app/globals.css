@@ -1,26 +1,205 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f8f6f2;
+  --foreground: #2c2c2c;
+  --gold: #b8956a;
+  --gold-dark: #9a7a52;
+  --gold-light: #d4b896;
+  --cream: #f8f6f2;
+  --cream-dark: #ede9e1;
+  --charcoal: #2c2c2c;
+  --muted: #6b6560;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-gold: var(--gold);
+  --color-gold-dark: var(--gold-dark);
+  --color-gold-light: var(--gold-light);
+  --color-cream: var(--cream);
+  --color-cream-dark: var(--cream-dark);
+  --color-charcoal: var(--charcoal);
+  --color-muted: var(--muted);
+  --font-sans: var(--font-inter);
+  --font-serif: var(--font-playfair);
+  --font-brand: var(--font-cinzel);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-inter), system-ui, sans-serif;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-playfair), Georgia, serif;
+}
+
+@keyframes hero-zoom {
+  from {
+    transform: scale(1.05);
+  }
+  to {
+    transform: scale(1.12);
+  }
+}
+
+.hero-bg {
+  animation: hero-zoom 22s ease-in-out infinite alternate;
+}
+
+@keyframes header-slide-down {
+  from {
+    transform: translate3d(0, -100%, 0);
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes header-slide-up {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(0, -100%, 0);
+  }
+}
+
+.header-slide-down {
+  animation: header-slide-down 0.95s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+  will-change: transform;
+}
+
+.header-slide-up {
+  animation: header-slide-up 0.6s cubic-bezier(0.4, 0, 0.68, 0.06) forwards;
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .header-slide-down,
+  .header-slide-up {
+    animation: none;
+  }
+
+  .hero-slide-track {
+    transition: none !important;
+  }
+
+  .hero-copy-next,
+  .hero-copy-prev {
+    animation: none !important;
+  }
+}
+
+@keyframes hero-copy-next {
+  from {
+    opacity: 0;
+    transform: translateX(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes hero-copy-prev {
+  from {
+    opacity: 0;
+    transform: translateX(-18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.hero-copy-next {
+  animation: hero-copy-next 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.hero-copy-prev {
+  animation: hero-copy-prev 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.hero-slide-track {
+  transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.hero-slide-track--dragging {
+  transition: none;
+}
+
+/* Logo yazısı — Inter, orijinal altın gradient */
+.logo-wordmark {
+  font-family: var(--font-inter), system-ui, sans-serif;
+  font-weight: 800;
+  text-transform: uppercase;
+  background: linear-gradient(
+    180deg,
+    #e8d4a8 0%,
+    #c9a05c 35%,
+    #9a7340 65%,
+    #d4b878 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-font-smoothing: antialiased;
+}
+
+.logo-wordmark--home {
+  font-size: 1.1875rem;
+}
+
+@media (min-width: 1024px) {
+  .logo-wordmark--home {
+    font-size: 1.3125rem;
+  }
+}
+
+.logo-wordmark--home span:first-child {
+  letter-spacing: 0.28em;
+}
+
+.logo-wordmark--home span:last-child {
+  letter-spacing: 0.38em;
+}
+
+.logo-wordmark--header {
+  font-size: 1rem;
+}
+
+@media (min-width: 1024px) {
+  .logo-wordmark--header {
+    font-size: 1.0625rem;
+  }
+}
+
+.logo-wordmark--header span:first-child {
+  letter-spacing: 0.26em;
+}
+
+.logo-wordmark--header span:last-child {
+  letter-spacing: 0.34em;
+}
+
+.logo-wordmark--footer {
+  font-size: 0.8125rem;
+}
+
+.logo-wordmark--footer span:first-child {
+  letter-spacing: 0.2em;
+}
+
+.logo-wordmark--footer span:last-child {
+  letter-spacing: 0.28em;
+}
+
+.logo-wordmark span:last-child {
+  font-weight: 700;
 }

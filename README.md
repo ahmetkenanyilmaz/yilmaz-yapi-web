@@ -1,36 +1,65 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Yılmaz Yapı — Kurumsal Web Sitesi
 
-## Getting Started
+İnşaat ve kentsel dönüşüm firması **Yılmaz Yapı** için vitrin (showcase) web sitesi.
 
-First, run the development server:
+Cosmic Hub projesinden tamamen bağımsızdır.
+
+## Hızlı başlangıç
 
 ```bash
+cd ~/Projects/yilmaz-yapi-web
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Tarayıcıda: [http://localhost:3000](http://localhost:3000)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Sayfalar
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Sayfa | URL |
+|-------|-----|
+| Anasayfa | `/` |
+| Kurumsal | `/kurumsal` |
+| Projeler | `/projeler` |
+| Proje detay | `/projeler/[slug]` |
+| Kentsel Dönüşüm | `/kentsel-donusum` |
+| İletişim | `/iletisim` |
+| KVKK | `/kvkk` |
+| Gizlilik | `/gizlilik` |
+| Admin (iskelet) | `/admin` |
 
-## Learn More
+## İletişim bilgileri
 
-To learn more about Next.js, take a look at the following resources:
+- **Telefon:** +90 532 732 90 60
+- **WhatsApp:** +90 553 139 32 20
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+(`src/lib/site-config.ts` dosyasından güncellenir)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Mevcut durum
 
-## Deploy on Vercel
+- ✅ Mockup'a uygun tasarım (krem/altın palet, serif başlıklar)
+- ✅ 12 placeholder proje
+- ✅ Telefon + WhatsApp entegrasyonu
+- ✅ Mobil uyumlu navigasyon
+- ⏳ Admin panel (iskelet — Supabase sonraki aşama)
+- ⏳ Gerçek proje fotoğrafları
+- ⏳ Domain + yayın
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## İletişim formu gerekli mi?
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+**Şu an hayır.** Telefon ve WhatsApp inşaat sektöründe daha etkili. İleride form eklemek isterseniz Supabase'e kayıt veya e-posta bildirimi eklenebilir.
+
+## Sonraki adımlar (Supabase admin)
+
+1. Supabase projesi oluştur
+2. `projects` tablosu + Storage (fotoğraf/video)
+3. Tek admin kullanıcı (Auth)
+4. `/admin` girişi ve CRUD paneli
+5. Vercel deploy + domain bağlama
+
+## Deploy
+
+```bash
+npm run build
+```
+
+Vercel'e push edildiğinde otomatik deploy olur. Domain en son adımda bağlanır.
