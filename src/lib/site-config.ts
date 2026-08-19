@@ -1,8 +1,12 @@
 export const siteConfig = {
   name: "Yılmaz Yapı",
+  legalName:
+    "Öz-Yılmaz Orman Ürünleri İnşaat Mobilya Nakliye San. ve Tic. Ltd. Şti.",
+  url: "https://yilmazyapi.ltd",
+  email: "info@yilmazyapi.ltd",
   tagline: "Kentsel Dönüşüm ve Modern Yaşam Alanları",
   description:
-    "İstanbul'da 20 yılı aşkın tecrübemizle güvenilir, kaliteli ve gelecek odaklı yaşam alanları inşa ediyoruz.",
+    "1977'ye uzanan üretim tecrübemizle İstanbul'da güvenilir, kaliteli ve gelecek odaklı yaşam alanları inşa ediyoruz.",
   address: {
     line1: "Şirinevler Mahallesi, Cengiz Topel Caddesi No: 1-2",
     line2: "Bahçelievler / İstanbul",
@@ -14,21 +18,22 @@ export const siteConfig = {
   phones: [
     {
       label: "Bizi Arayın",
+      name: "Kadir YILMAZ",
       number: "+90 532 732 90 60",
       href: "tel:+905327329060",
       whatsapp: "https://wa.me/905327329060",
     },
     {
       label: "WhatsApp",
+      name: "Ahmet Kenan YILMAZ",
       number: "+90 553 139 32 20",
       href: "tel:+905531393220",
       whatsapp: "https://wa.me/905531393220",
     },
   ],
   social: {
-    instagram: "#",
-    facebook: "#",
-    linkedin: "#",
+    instagram: "https://www.instagram.com/yilmazyapiresmi/",
+    instagramHandle: "@yilmazyapiresmi",
   },
   nav: [
     { href: "/", label: "Anasayfa" },

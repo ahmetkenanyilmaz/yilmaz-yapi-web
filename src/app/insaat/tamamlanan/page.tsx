@@ -4,13 +4,15 @@ import {
 } from "@/components/projects/projects-listing-page";
 import { getCompletedProjects } from "@/lib/projects";
 
+export const dynamic = "force-dynamic";
+
 export const metadata = createProjectsMetadata(
   "Tamamlanan Projeler",
   "Yılmaz Yapı tarafından tamamlanan inşaat projeleri.",
 );
 
-export default function TamamlananPage() {
-  const projects = getCompletedProjects();
+export default async function TamamlananPage() {
+  const projects = await getCompletedProjects();
 
   return (
     <ProjectsListingPage

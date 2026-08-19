@@ -4,7 +4,7 @@ export function UrbanCta() {
   return (
     <section className="border-t border-cream-dark bg-cream py-16 sm:py-20">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col items-center gap-6 rounded-sm border border-cream-dark bg-white px-6 py-10 sm:flex-row sm:justify-between sm:px-12">
+        <div className="flex flex-col items-center gap-6 rounded-sm border border-cream-dark bg-[#f8f6f2] px-6 py-10 sm:flex-row sm:justify-between sm:px-12">
           <div className="flex items-center gap-5">
             <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full border-2 border-gold text-gold">
               <HomeLeafIcon />

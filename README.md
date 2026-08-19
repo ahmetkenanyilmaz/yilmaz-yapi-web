@@ -25,7 +25,8 @@ Tarayıcıda: [http://localhost:3000](http://localhost:3000)
 | İletişim | `/iletisim` |
 | KVKK | `/kvkk` |
 | Gizlilik | `/gizlilik` |
-| Admin (iskelet) | `/admin` |
+| Admin giriş | `/admin/login` |
+| Admin paneli | `/admin` |
 
 ## İletişim bilgileri
 
@@ -37,24 +38,53 @@ Tarayıcıda: [http://localhost:3000](http://localhost:3000)
 ## Mevcut durum
 
 - ✅ Mockup'a uygun tasarım (krem/altın palet, serif başlıklar)
-- ✅ 12 placeholder proje
+- ✅ Projeler Supabase üzerinden yönetilir (admin paneli)
 - ✅ Telefon + WhatsApp entegrasyonu
 - ✅ Mobil uyumlu navigasyon
-- ⏳ Admin panel (iskelet — Supabase sonraki aşama)
-- ⏳ Gerçek proje fotoğrafları
-- ⏳ Domain + yayın
 
-## İletişim formu gerekli mi?
+## Admin / Supabase kurulumu
 
-**Şu an hayır.** Telefon ve WhatsApp inşaat sektöründe daha etkili. İleride form eklemek isterseniz Supabase'e kayıt veya e-posta bildirimi eklenebilir.
+Sahte URL veya API anahtarı kullanmayın. Aşağıdaki adımları kendi Supabase hesabınızda uygulayın.
 
-## Sonraki adımlar (Supabase admin)
+1. [supabase.com](https://supabase.com) üzerinde yeni bir proje oluşturun.
+2. **Authentication > Providers** içinde Email girişini açık tutun.
+3. **Authentication > Users** üzerinden tek bir yönetici kullanıcı ekleyin (e-posta + şifre).
+4. **SQL Editor** içinde `supabase/migrations/202608160001_projects_admin.sql` dosyasının tamamını çalıştırın.
+5. Aynı SQL Editor’da yöneticiyi yetkilendirin (e-postayı kendi adresinizle değiştirin):
 
-1. Supabase projesi oluştur
-2. `projects` tablosu + Storage (fotoğraf/video)
-3. Tek admin kullanıcı (Auth)
-4. `/admin` girişi ve CRUD paneli
-5. Vercel deploy + domain bağlama
+```sql
+insert into public.admin_users (user_id)
+select id from auth.users
+where email = 'sizin-admin@adresiniz.com';
+```
+
+6. **Project Settings > API** bölümünden değerleri kopyalayıp proje köküne `.env.local` dosyası oluşturun:
+
+```
+NEXT_PUBLIC_SUPABASE_URL=https://xxxx.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJ...
+```
+
+`service_role` anahtarını bu dosyaya veya istemci koda koymayın.
+
+7. Geliştirme sunucusunu yeniden başlatın ve `/admin/login` ile giriş yapın.
+
+## İletişim formu (Resend)
+
+Formun çalışması için [resend.com](https://resend.com) hesabı ve doğrulanmış gönderen domain gerekir.
+
+1. Resend’de ücretsiz hesap açın.
+2. **API Keys** → yeni anahtar oluşturun (`re_...`).
+3. **Domains** → `yilmazyapi.ltd` ekleyin. Paneldeki TXT / MX kayıtlarını domain DNS’ine ekleyin ve yeşil “Verified” olana kadar bekleyin.
+4. `.env.local` (ve yayın sonrası Vercel Environment Variables) içine:
+
+```
+RESEND_API_KEY=re_...
+CONTACT_TO_EMAIL=info@yilmazyapi.ltd
+CONTACT_FROM_EMAIL=Yılmaz Yapı <info@yilmazyapi.ltd>
+```
+
+Domain doğrulanmadan `CONTACT_FROM_EMAIL` boş bırakılırsa form 503 döner. Test için geçici olarak `onboarding@resend.dev` kullanılabilir; bu adres yalnızca Resend hesap e-postanıza mail atar.
 
 ## Deploy
 
@@ -62,4 +92,10 @@ Tarayıcıda: [http://localhost:3000](http://localhost:3000)
 npm run build
 ```
 
-Vercel'e push edildiğinde otomatik deploy olur. Domain en son adımda bağlanır.
+Vercel’e taşıyınca şu değişkenleri proje ayarlarına ekleyin:
+
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- `RESEND_API_KEY`
+- `CONTACT_TO_EMAIL`
+- `CONTACT_FROM_EMAIL`

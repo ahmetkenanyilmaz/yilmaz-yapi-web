@@ -25,7 +25,7 @@ export function ProjectsListingPage({
       <PageBanner title={title} subtitle={subtitle} description={description} />
       <section className="mx-auto max-w-7xl bg-cream px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
         {projects.length === 0 ? (
-          <p className="text-center text-muted">Bu kategoride henüz proje bulunmuyor.</p>
+          <p className="text-center text-muted">Projelerimiz yakında burada.</p>
         ) : (
           <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
             {projects.map((project) => (

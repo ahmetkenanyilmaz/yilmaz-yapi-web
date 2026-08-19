@@ -10,7 +10,7 @@ export function ContactBar() {
         <ContactItem
           icon={<PhoneIcon />}
           title={primary.number}
-          subtitle={primary.label}
+          subtitle={primary.name}
           href={primary.href}
         />
         <div className="flex items-center gap-4 px-6 py-6 transition-colors hover:bg-cream sm:px-8">
@@ -28,7 +28,7 @@ export function ContactBar() {
                   rel="noopener noreferrer"
                   className="block text-sm text-muted hover:text-gold"
                 >
-                  {phone.number}
+                  {phone.number} - {phone.name}
                 </a>
               ))}
             </div>

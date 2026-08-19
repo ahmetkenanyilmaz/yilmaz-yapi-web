@@ -1,227 +1,160 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { siteConfig } from "@/lib/site-config";
+import { useEffect, useRef, useState } from "react";
 
 const SLIDES = [
   {
     image:
       "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=1200&q=85",
-    tag: "Daha Değerli",
-    highlight: "YENİ BİR YAŞAM",
-    text: "Kentsel dönüşüm ve modern konut projelerinde güvenilir mühendislik, şeffaf süreçler ve kaliteli işçilik.",
+    title: "Daha Değerli Bir Gelecek İnşa Ediyoruz",
+    text: "Kentsel dönüşüm ve modern yapı anlayışıyla güvenli, nitelikli ve değer kazanan yaşam alanları oluşturuyoruz.",
+    overlayTitle: "GELECEĞE DEĞER KATIYORUZ",
+    overlayText:
+      "Bugünün ihtiyaçlarını, yarının yaşam standartlarıyla buluşturan projeler geliştiriyoruz.",
   },
   {
     image:
       "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1200&q=85",
-    tag: "Güvenilir",
-    highlight: "YAŞAM ALANLARI",
-    text: "Deprem yönetmeliğine uygun, modern mimari anlayışla İstanbul'un dört bir yanında projeler yükseltiyoruz.",
+    title: "Güvenle Yükselen Yaşam Alanları",
+    text: "Sağlam mühendislik, kaliteli işçilik ve şeffaf süreçlerle projelerimizi hayata geçiriyoruz.",
+    overlayTitle: "TEMELİMİZ GÜVEN",
+    overlayText:
+      "Her projede mühendislikten uygulamaya kadar güveni ve kaliteyi ön planda tutuyoruz.",
   },
   {
     image:
-      "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=1200&q=85",
-    tag: "Şeffaf",
-    highlight: "KENTSEL DÖNÜŞÜM",
-    text: "Hak sahiplerine güvenilir ve anlaşılır çözümler sunuyoruz.",
+      "https://images.unsplash.com/photo-1460317442991-0ec209397118?w=1200&q=85",
+    title: "Konforu Gelecekle Buluşturuyoruz",
+    text: "Modern, işlevsel ve değerini koruyan yaşam alanlarını estetikle bir araya getiriyoruz.",
+    overlayTitle: "YAŞAM İÇİN TASARLIYORUZ",
+    overlayText:
+      "Sadece yapılar değil; konforlu, işlevsel ve uzun yıllar değerini koruyan yaşam alanları inşa ediyoruz.",
   },
 ];
 
-const SWIPE_THRESHOLD = 48;
-const AUTOPLAY_MS = 6000;
-
 export function Hero() {
+  const viewportRef = useRef<HTMLDivElement>(null);
+  const startX = useRef(0);
+  const startIndex = useRef(0);
+  const pausedUntil = useRef(0);
   const [active, setActive] = useState(0);
-  const [direction, setDirection] = useState(1);
-  const [dragOffset, setDragOffset] = useState(0);
-  const [isDragging, setIsDragging] = useState(false);
-  const dragStartX = useRef<number | null>(null);
-  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const goTo = useCallback((index: number, dir: number) => {
-    setDirection(dir);
-    setActive(index);
-  }, []);
+  const slideWidth = () => viewportRef.current?.clientWidth || 1;
 
-  const goNext = useCallback(() => {
-    setDirection(1);
-    setActive((prev) => (prev + 1) % SLIDES.length);
-  }, []);
-
-  const goPrev = useCallback(() => {
-    setDirection(-1);
-    setActive((prev) => (prev - 1 + SLIDES.length) % SLIDES.length);
-  }, []);
-
-  const resetAutoplay = useCallback(() => {
-    if (timerRef.current) clearInterval(timerRef.current);
-    timerRef.current = setInterval(goNext, AUTOPLAY_MS);
-  }, [goNext]);
+  const goTo = (index: number) => {
+    const next = (index + SLIDES.length) % SLIDES.length;
+    viewportRef.current?.scrollTo({
+      left: next * slideWidth(),
+      behavior: "smooth",
+    });
+    setActive(next);
+  };
 
   useEffect(() => {
-    resetAutoplay();
-    return () => {
-      if (timerRef.current) clearInterval(timerRef.current);
+    const viewport = viewportRef.current;
+    if (!viewport) return;
+
+    const sync = () => {
+      const index = Math.round(viewport.scrollLeft / slideWidth()) % SLIDES.length;
+      setActive(index);
     };
-  }, [resetAutoplay]);
 
-  const finishDrag = useCallback(
-    (clientX: number) => {
-      if (dragStartX.current === null) return;
+    viewport.addEventListener("scroll", sync, { passive: true });
 
-      const delta = clientX - dragStartX.current;
-      dragStartX.current = null;
-      setIsDragging(false);
-      setDragOffset(0);
-
-      if (Math.abs(delta) < SWIPE_THRESHOLD) return;
-
-      if (delta < 0) goNext();
-      else goPrev();
-
-      resetAutoplay();
-    },
-    [goNext, goPrev, resetAutoplay],
-  );
-
-  const startDrag = useCallback((clientX: number) => {
-    dragStartX.current = clientX;
-    setIsDragging(true);
-    setDragOffset(0);
-  }, []);
-
-  const moveDrag = useCallback((clientX: number) => {
-    if (dragStartX.current === null) return;
-    setDragOffset(clientX - dragStartX.current);
-  }, []);
-
-  useEffect(() => {
-    const onMouseMove = (e: MouseEvent) => moveDrag(e.clientX);
-    const onMouseUp = (e: MouseEvent) => finishDrag(e.clientX);
-
-    window.addEventListener("mousemove", onMouseMove);
-    window.addEventListener("mouseup", onMouseUp);
+    const timer = window.setInterval(() => {
+      if (Date.now() < pausedUntil.current) return;
+      const current = Math.round(viewport.scrollLeft / slideWidth()) % SLIDES.length;
+      goTo(current + 1);
+    }, 12000);
 
     return () => {
-      window.removeEventListener("mousemove", onMouseMove);
-      window.removeEventListener("mouseup", onMouseUp);
+      viewport.removeEventListener("scroll", sync);
+      window.clearInterval(timer);
     };
-  }, [finishDrag, moveDrag]);
+  }, []);
 
   const slide = SLIDES[active];
-  const primaryPhone = siteConfig.phones[0];
-  const copyAnimClass =
-    direction > 0 ? "hero-copy-next" : "hero-copy-prev";
 
   return (
-    <section className="h-full min-h-0 px-4 sm:px-6 lg:px-8">
-      <div className="mx-auto grid h-full min-h-0 max-w-7xl grid-cols-1 items-stretch gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,2.2fr)] lg:gap-8">
-        {/* Sol kolon */}
-        <div className="hidden min-h-0 lg:flex lg:flex-col lg:justify-start lg:pt-10 xl:pt-14">
-          <div key={active} className={copyAnimClass}>
-            <p className="min-h-[4.75rem] font-serif text-[1.65rem] leading-tight text-charcoal xl:min-h-[5.25rem] xl:text-[2.1rem]">
-              {slide.tag}
-              <br />
-              <strong className="font-bold">{slide.highlight}</strong>
-            </p>
-            <div className="my-4 ml-auto w-24 shrink-0 border-t-2 border-charcoal" />
-            <p className="ml-auto min-h-[5.5rem] max-w-[240px] text-right text-sm leading-relaxed text-muted xl:min-h-[6rem] xl:text-[15px]">
-              {slide.text}
-            </p>
-          </div>
+    <section className="yy-hero px-4 pt-10 pb-6 sm:px-6 lg:flex lg:h-full lg:min-h-0 lg:items-center lg:px-8 lg:py-0">
+      <div className="mx-auto grid w-full max-w-7xl items-start gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.7fr)] lg:items-center lg:gap-12">
+        <div className="pt-4 lg:pt-0">
+          <p className="font-serif text-[1.35rem] leading-tight text-charcoal lg:text-[1.65rem] xl:text-[2.1rem]">
+            <strong className="font-bold">{slide.title}</strong>
+          </p>
+          <div className="my-3 ml-auto w-16 shrink-0 border-t-2 border-charcoal lg:my-4 lg:w-24" />
+          <p className="ml-auto max-w-[240px] text-right text-sm leading-relaxed text-muted xl:text-[15px]">
+            {slide.text}
+          </p>
         </div>
 
-        {/* Sağ: slider */}
-        <div className="relative flex min-h-0 flex-col">
-          <div className="absolute -top-px -right-px z-20 hidden sm:block">
+        <div className="relative flex min-h-0 min-w-0 flex-col">
+          <div className="relative min-w-0 overflow-hidden border-2 border-charcoal bg-white shadow-sm h-[240px] sm:h-[260px] lg:h-[420px]">
             <div
-              className="bg-charcoal px-5 py-2 text-xs font-medium tracking-wide text-white lg:text-sm"
-              style={{ clipPath: "polygon(12% 0, 100% 0, 100% 100%, 0 100%)" }}
-            >
-              {primaryPhone.number}
-            </div>
-          </div>
-
-          <div className="relative min-h-0 flex-1 overflow-hidden border-2 border-charcoal bg-white shadow-sm">
-            <div
-              className="relative h-full min-h-[200px] cursor-grab touch-pan-y select-none active:cursor-grabbing lg:min-h-0"
-              onMouseDown={(e) => {
-                e.preventDefault();
-                startDrag(e.clientX);
+              ref={viewportRef}
+              id="yy-hero-viewport"
+              className="yy-hero-viewport absolute inset-0 h-full"
+              onTouchStart={(event) => {
+                pausedUntil.current = Date.now() + 7000;
+                startX.current = event.touches[0].clientX;
+                startIndex.current = active;
               }}
-              onTouchStart={(e) => startDrag(e.touches[0].clientX)}
-              onTouchMove={(e) => moveDrag(e.touches[0].clientX)}
-              onTouchEnd={(e) => finishDrag(e.changedTouches[0].clientX)}
+              onTouchEnd={(event) => {
+                const dx = event.changedTouches[0].clientX - startX.current;
+                if (Math.abs(dx) < 40) return;
+                pausedUntil.current = Date.now() + 7000;
+                if (startIndex.current === SLIDES.length - 1 && dx < 0) goTo(0);
+                if (startIndex.current === 0 && dx > 0) goTo(SLIDES.length - 1);
+              }}
             >
-              <div
-                className={`hero-slide-track flex h-full ${isDragging ? "hero-slide-track--dragging" : ""}`}
-                style={{
-                  transform: `translateX(calc(-${active * 100}% + ${dragOffset}px))`,
-                }}
-              >
-                {SLIDES.map((s) => (
-                  <div
-                    key={s.image}
-                    className="h-full min-w-full shrink-0 bg-cover bg-center"
-                    style={{ backgroundImage: `url('${s.image}')` }}
-                    draggable={false}
-                  />
+              <div className="yy-hero-track">
+                {SLIDES.map((item) => (
+                  <article key={item.image} className="yy-hero-unit">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={item.image} alt="" draggable={false} />
+                    <div className="hero-slide-copy">
+                      <p>{item.overlayTitle}</p>
+                      <span>{item.overlayText}</span>
+                    </div>
+                  </article>
                 ))}
               </div>
-
-              <div
-                key={active}
-                className={`pointer-events-none absolute bottom-0 left-0 max-w-[85%] bg-charcoal/90 px-4 py-3 text-white sm:max-w-[70%] sm:px-5 sm:py-4 ${copyAnimClass}`}
-              >
-                <p className="text-[10px] uppercase tracking-wider text-gold-light sm:text-xs">
-                  {slide.tag}
-                </p>
-                <p className="mt-1 font-serif text-sm font-bold uppercase sm:text-base">
-                  {slide.highlight}
-                </p>
-                <p className="mt-1.5 hidden text-xs leading-relaxed text-white/80 sm:block">
-                  {slide.text}
-                </p>
-              </div>
             </div>
           </div>
 
-          <div className="mt-2.5 flex shrink-0 items-center justify-center gap-2">
-            {SLIDES.map((_, i) => (
+          <div className="mt-3 flex shrink-0 items-center justify-center gap-2">
+            {SLIDES.map((_, index) => (
               <button
-                key={i}
+                key={index}
                 type="button"
-                aria-label={`Slayt ${i + 1}`}
+                aria-label={`Slayt ${index + 1}`}
                 onClick={() => {
-                  if (i === active) return;
-                  goTo(i, i > active ? 1 : -1);
-                  resetAutoplay();
+                  pausedUntil.current = Date.now() + 7000;
+                  goTo(index);
                 }}
-                className={`h-1 transition-all duration-300 ${
-                  i === active
-                    ? "w-10 skew-x-[-20deg] bg-charcoal"
-                    : "w-6 skew-x-[-20deg] bg-charcoal/25 hover:bg-charcoal/45"
-                }`}
-              />
+                className="flex h-11 w-11 items-center justify-center"
+              >
+                <span className="yy-hero-dot" />
+              </button>
             ))}
           </div>
-
-          <div className="mt-3 flex shrink-0 flex-wrap justify-center gap-3 pb-1 lg:hidden">
-            <Link
-              href="/insaat/devam-eden"
-              className="bg-charcoal px-5 py-2 text-xs font-semibold uppercase tracking-wider text-white"
-            >
-              Projeleri İncele
-            </Link>
-            <Link
-              href="/iletisim"
-              className="border border-charcoal px-5 py-2 text-xs font-semibold uppercase tracking-wider text-charcoal"
-            >
-              İletişim
-            </Link>
-          </div>
         </div>
+      </div>
+
+      <div className="mt-2 flex shrink-0 flex-wrap justify-center gap-3 pb-2 lg:hidden">
+        <Link
+          href="/insaat/devam-eden"
+          className="bg-charcoal px-5 py-3 text-sm font-semibold uppercase tracking-wider text-white"
+        >
+          Projeleri İncele
+        </Link>
+        <Link
+          href="/iletisim"
+          className="border border-charcoal px-5 py-3 text-sm font-semibold uppercase tracking-wider text-charcoal"
+        >
+          İletişim
+        </Link>
       </div>
     </section>
   );

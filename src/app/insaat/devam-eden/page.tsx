@@ -4,19 +4,21 @@ import {
 } from "@/components/projects/projects-listing-page";
 import { getOngoingProjects } from "@/lib/projects";
 
+export const dynamic = "force-dynamic";
+
 export const metadata = createProjectsMetadata(
   "Devam Eden Projeler",
   "Yılmaz Yapı devam eden ve planlama aşamasındaki inşaat projeleri.",
 );
 
-export default function DevamEdenPage() {
-  const projects = getOngoingProjects();
+export default async function DevamEdenPage() {
+  const projects = await getOngoingProjects();
 
   return (
     <ProjectsListingPage
       title="Devam Eden Projeler"
       subtitle="İnşaat"
-      description="Halihazırda inşa edilmekte olan ve planlama aşamasındaki projelerimiz."
+      description="Halihazırda inşa edilmekte olan projelerimiz."
       projects={projects}
       currentPath="/insaat/devam-eden"
     />

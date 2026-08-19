@@ -1,20 +1,21 @@
-import { SiteHeader } from "@/components/layout/site-header";
+import { Header } from "@/components/layout/site-header";
 import { HomeFooter } from "@/components/layout/home-footer";
+import { AboutSection } from "@/components/home/about-section";
+import { UrbanCta } from "@/components/home/urban-cta";
 
 type HomeLayoutProps = {
   children: React.ReactNode;
 };
 
-/** AKİ: açılışta tam ekran kompozisyon; hafif kaydırma ile sticky header; footer en altta */
 export function HomeLayout({ children }: HomeLayoutProps) {
   return (
     <>
-      <div className="grid min-h-dvh grid-rows-[auto_1fr] bg-cream lg:h-dvh">
-        <SiteHeader currentPath="/" />
-        <main className="min-h-0 max-lg:overflow-visible lg:overflow-hidden">{children}</main>
+      <div className="grid bg-[#f8f6f2] lg:h-dvh lg:grid-rows-[auto_1fr]">
+        <Header currentPath="/" />
+        <main className="lg:min-h-0 lg:overflow-hidden">{children}</main>
       </div>
-      {/* Sticky header tetiklemek için minimal kaydırma alanı */}
-      <div aria-hidden className="h-28 bg-cream" />
+      <AboutSection />
+      <UrbanCta />
       <HomeFooter />
     </>
   );

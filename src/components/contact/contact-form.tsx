@@ -1,6 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
+
+const fieldClass =
+  "w-full border border-[#e6e1d8] bg-[#fbfaf7] px-4 py-3.5 text-sm text-charcoal placeholder:text-muted/50 outline-none transition-[border-color] duration-[250ms] ease-in-out hover:border-[#B8934A]/70 focus:border-[#B8934A] disabled:opacity-60";
 
 export function ContactForm() {
   const [sent, setSent] = useState(false);
@@ -23,6 +27,8 @@ export function ContactForm() {
           name: data.get("name"),
           email: data.get("email"),
           message: data.get("message"),
+          company: data.get("company"),
+          kvkk: data.get("kvkk") === "on",
         }),
       });
 
@@ -44,7 +50,7 @@ export function ContactForm() {
 
   if (sent) {
     return (
-      <div className="rounded-sm border border-gold/30 bg-cream p-6 text-center">
+      <div className="border border-[#ede9e1] bg-[#fbfaf7] px-6 py-8 text-center">
         <p className="font-medium text-charcoal">Mesajınız alındı.</p>
         <p className="mt-2 text-sm text-muted">
           En kısa sürede sizinle iletişime geçeceğiz. Acil talepler için telefon
@@ -55,9 +61,9 @@ export function ContactForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="relative space-y-5">
       {error && (
-        <p className="rounded-sm border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
+        <p className="border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
           {error}
         </p>
       )}
@@ -70,9 +76,11 @@ export function ContactForm() {
           name="name"
           type="text"
           required
+          autoComplete="name"
+          maxLength={120}
           disabled={loading}
           placeholder="İsim"
-          className="w-full border border-cream-dark bg-white px-4 py-3 text-sm text-charcoal placeholder:text-muted/60 focus:border-gold focus:outline-none disabled:opacity-60"
+          className={fieldClass}
         />
       </div>
       <div>
@@ -83,9 +91,23 @@ export function ContactForm() {
           id="email"
           name="email"
           type="email"
+          required
+          autoComplete="email"
+          maxLength={254}
           disabled={loading}
           placeholder="E-Posta"
-          className="w-full border border-cream-dark bg-white px-4 py-3 text-sm text-charcoal placeholder:text-muted/60 focus:border-gold focus:outline-none disabled:opacity-60"
+          className={fieldClass}
+        />
+      </div>
+      <div aria-hidden="true" className="absolute -left-[9999px] h-0 w-0 overflow-hidden">
+        <label htmlFor="company">Şirket</label>
+        <input
+          id="company"
+          name="company"
+          type="text"
+          tabIndex={-1}
+          autoComplete="off"
+          disabled={loading}
         />
       </div>
       <div>
@@ -97,15 +119,35 @@ export function ContactForm() {
           name="message"
           required
           rows={6}
+          maxLength={4000}
           disabled={loading}
           placeholder="Mesajınız"
-          className="w-full resize-none border border-cream-dark bg-white px-4 py-3 text-sm text-charcoal placeholder:text-muted/60 focus:border-gold focus:outline-none disabled:opacity-60"
+          className={`${fieldClass} resize-none`}
         />
       </div>
+      <label className="flex items-start gap-3 text-xs leading-relaxed text-muted">
+        <input
+          type="checkbox"
+          name="kvkk"
+          required
+          disabled={loading}
+          className="mt-0.5 size-4 shrink-0 accent-[#B8934A]"
+        />
+        <span>
+          <Link
+            href="/kvkk"
+            className="text-charcoal underline decoration-[#B8934A]/50 underline-offset-2 hover:text-[#B8934A]"
+          >
+            KVKK Aydınlatma Metni
+          </Link>
+          &apos;ni okudum; kişisel verilerimin talebime yanıt verilmesi
+          amacıyla işlenmesini kabul ediyorum.
+        </span>
+      </label>
       <button
         type="submit"
         disabled={loading}
-        className="w-full bg-charcoal px-6 py-3 text-sm font-semibold uppercase tracking-wider text-white transition-colors hover:bg-gold disabled:opacity-60 sm:w-auto"
+        className="rounded-sm bg-[#B8934A] px-8 py-3 text-sm font-semibold uppercase tracking-wider text-[#f8f6f2] transition-all duration-[250ms] ease-in-out hover:bg-[#2c2c2c] hover:text-white disabled:opacity-60"
       >
         {loading ? "Gönderiliyor…" : "Gönder"}
       </button>

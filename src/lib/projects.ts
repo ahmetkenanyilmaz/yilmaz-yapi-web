@@ -1,205 +1,146 @@
-import type { Project } from "@/types/project";
+import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { mapProject, type MediaRow, type ProjectRow } from "@/lib/project-mappers";
+import type { Project, ProjectStatus } from "@/types/project";
 
-const placeholderImages = [
-  "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1200&q=80",
-  "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=1200&q=80",
-  "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=1200&q=80",
-  "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1200&q=80",
-  "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=1200&q=80",
-  "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1200&q=80",
-  "https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?w=1200&q=80",
-  "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=1200&q=80",
-  "https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=1200&q=80",
-  "https://images.unsplash.com/photo-1605276374101-dee0a782c10?w=1200&q=80",
-  "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=1200&q=80",
-  "https://images.unsplash.com/photo-1600573472591-ee6981b9570f?w=1200&q=80",
-];
+async function fetchMedia(projectIds: string[]) {
+  if (projectIds.length === 0) return [] as MediaRow[];
+  const supabase = await createServerSupabaseClient();
+  if (!supabase) return [];
 
-export const projects: Project[] = [
-  {
-    slug: "zumrut-vadi-rezidans",
-    title: "Zümrüt Vadi Rezidans",
-    location: "Kağıthane, İstanbul",
-    status: "devam-ediyor",
-    summary: "Modern yaşamın tüm konforunu sunan, yeşil alanlarla çevrili rezidans projesi.",
-    description:
-      "Zümrüt Vadi Rezidans, İstanbul'un yükselen değer bölgelerinden Kağıthane'de konumlanmaktadır. Proje; geniş balkonlar, sosyal donatı alanları ve güvenli otopark imkânlarıyla aileler için ideal bir yaşam alanı sunmaktadır.",
-    image: placeholderImages[0],
-    featured: true,
-    units: "84 daire",
-    area: "12.500 m²",
-    year: "2024–2026",
-  },
-  {
-    slug: "nova-park-evleri",
-    title: "Nova Park Evleri",
-    location: "Başakşehir, İstanbul",
-    status: "tamamlandi",
-    summary: "Tamamlanan, park manzaralı modern konut projesi.",
-    description:
-      "Nova Park Evleri, Başakşehir'in sakin ve planlı yerleşim alanında hayata geçirilmiştir. Proje teslim edilmiş olup, site sakinleri konforlu yaşam alanlarına kavuşmuştur.",
-    image: placeholderImages[1],
-    featured: true,
-    units: "56 daire",
-    area: "8.200 m²",
-    year: "2022",
-  },
-  {
-    slug: "yesil-tepe-konaklari",
-    title: "Yeşil Tepe Konakları",
-    location: "Ümraniye, İstanbul",
-    status: "devam-ediyor",
-    summary: "Kentsel dönüşüm kapsamında yenilenen yaşam alanı.",
-    description:
-      "Yeşil Tepe Konakları, kentsel dönüşüm sürecinde güvenli ve şeffaf bir yaklaşımla hayata geçirilmektedir. Deprem yönetmeliğine uygun yapı sistemi ve modern mimari anlayış bir arada.",
-    image: placeholderImages[2],
-    featured: true,
-    units: "120 daire",
-    area: "18.000 m²",
-    year: "2025–2027",
-  },
-  {
-    slug: "altin-port-residence",
-    title: "Altın Port Residence",
-    location: "Kartal, İstanbul",
-    status: "planlama",
-    summary: "Deniz manzaralı lüks konut projesi — planlama aşamasında.",
-    description:
-      "Altın Port Residence, Kartal sahil şeridine yakın konumuyla dikkat çeken yeni nesil bir konut projesidir. Proje detayları yakında paylaşılacaktır.",
-    image: placeholderImages[3],
-    featured: false,
-    units: "96 daire",
-    area: "14.800 m²",
-    year: "2027",
-  },
-  {
-    slug: "bahce-kent-evleri",
-    title: "Bahçe Kent Evleri",
-    location: "Pendik, İstanbul",
-    status: "tamamlandi",
-    summary: "Geniş bahçeli, düşük katlı konut projesi.",
-    description:
-      "Bahçe Kent Evleri, ailelerin tercih ettiği sakin bir mahallede tamamlanmıştır. Her dairede özel bahçe ve otopark imkânı sunulmaktadır.",
-    image: placeholderImages[4],
-    featured: false,
-    units: "32 daire",
-    area: "6.400 m²",
-    year: "2021",
-  },
-  {
-    slug: "merkez-plaza-konutlari",
-    title: "Merkez Plaza Konutları",
-    location: "Maltepe, İstanbul",
-    status: "devam-ediyor",
-    summary: "Merkezi konumda, ulaşım avantajlı konut projesi.",
-    description:
-      "Merkez Plaza Konutları, metro ve ana ulaşım hatlarına yakın konumuyla yatırımcıların ve ailelerin ilgisini çekmektedir.",
-    image: placeholderImages[5],
-    featured: false,
-    units: "72 daire",
-    area: "11.200 m²",
-    year: "2024–2026",
-  },
-  {
-    slug: "gunes-vadi-sitesi",
-    title: "Güneş Vadi Sitesi",
-    location: "Sancaktepe, İstanbul",
-    status: "tamamlandi",
-    summary: "Spor alanları ve çocuk parkıyla donatılmış site projesi.",
-    description:
-      "Güneş Vadi Sitesi, sosyal donatı alanlarıyla öne çıkan tamamlanmış bir projedir. Yüzme havuzu, fitness salonu ve çocuk oyun alanları mevcuttur.",
-    image: placeholderImages[6],
-    featured: false,
-    units: "108 daire",
-    area: "16.500 m²",
-    year: "2020",
-  },
-  {
-    slug: "elit-yasam-residence",
-    title: "Elit Yaşam Residence",
-    location: "Ataşehir, İstanbul",
-    status: "devam-ediyor",
-    summary: "Prestijli lokasyonda yüksek standartlı konut projesi.",
-    description:
-      "Elit Yaşam Residence, Ataşehir'in en değerli bölgelerinden birinde yükselmektedir. Akıllı ev sistemleri ve premium malzeme kullanımı ön plandadır.",
-    image: placeholderImages[7],
-    featured: false,
-    units: "64 daire",
-    area: "10.800 m²",
-    year: "2025–2026",
-  },
-  {
-    slug: "vadi-istanbul-evleri",
-    title: "Vadi İstanbul Evleri",
-    location: "Sarıyer, İstanbul",
-    status: "planlama",
-    summary: "Doğa ile iç içe, butik ölçekli konut projesi.",
-    description:
-      "Vadi İstanbul Evleri, yeşil alanlarla çevrili butik bir proje olarak planlanmaktadır. Detaylı bilgi için bizimle iletişime geçebilirsiniz.",
-    image: placeholderImages[8],
-    featured: false,
-    units: "24 daire",
-    area: "5.600 m²",
-    year: "2028",
-  },
-  {
-    slug: "deniz-yildizi-konutlari",
-    title: "Deniz Yıldızı Konutları",
-    location: "Tuzla, İstanbul",
-    status: "devam-ediyor",
-    summary: "Sahil bandına yakın, modern mimari konut projesi.",
-    description:
-      "Deniz Yıldızı Konutları, Tuzla'nın gelişen bölgesinde inşa edilmektedir. Deniz manzaralı daire seçenekleri ve geniş teras alanları sunulmaktadır.",
-    image: placeholderImages[9],
-    featured: false,
-    units: "48 daire",
-    area: "9.100 m²",
-    year: "2024–2025",
-  },
-  {
-    slug: "park-cadde-residence",
-    title: "Park Cadde Residence",
-    location: "Beylikdüzü, İstanbul",
-    status: "tamamlandi",
-    summary: "Cadde üzerinde ticari+konut karma proje.",
-    description:
-      "Park Cadde Residence, zemin katında ticari alanlar, üst katlarda konut birimleri barındıran karma kullanımlı bir projedir.",
-    image: placeholderImages[10],
-    featured: false,
-    units: "40 daire + 8 dükkan",
-    area: "7.800 m²",
-    year: "2019",
-  },
-  {
-    slug: "yildiz-tepe-villalari",
-    title: "Yıldız Tepe Villaları",
-    location: "Çekmeköy, İstanbul",
-    status: "planlama",
-    summary: "Müstakil villa konseptinde lüks yaşam projesi.",
-    description:
-      "Yıldız Tepe Villaları, İstanbul'un doğusunda müstakil villa konseptiyle planlanmaktadır. Her villa özel bahçe ve havuz imkânına sahip olacaktır.",
-    image: placeholderImages[11],
-    featured: false,
-    units: "12 villa",
-    area: "15.000 m²",
-    year: "2028",
-  },
-];
+  const { data, error } = await supabase
+    .from("project_media")
+    .select(
+      "id, project_id, type, url, storage_path, title, description, thumbnail_url, sort_order",
+    )
+    .in("project_id", projectIds)
+    .order("sort_order", { ascending: true });
 
-export function getProjectBySlug(slug: string): Project | undefined {
-  return projects.find((p) => p.slug === slug);
+  if (error || !data) return [];
+  return data as MediaRow[];
 }
 
-export function getFeaturedProjects(): Project[] {
-  return projects.filter((p) => p.featured);
-}
-
-export function getOngoingProjects(): Project[] {
-  return projects.filter(
-    (p) => p.status === "devam-ediyor" || p.status === "planlama",
+function attachMedia(rows: ProjectRow[], media: MediaRow[]): Project[] {
+  return rows.map((row) =>
+    mapProject(
+      row,
+      media.filter((item) => item.project_id === row.id),
+    ),
   );
 }
 
-export function getCompletedProjects(): Project[] {
-  return projects.filter((p) => p.status === "tamamlandi");
+export async function getPublishedProjects(status?: ProjectStatus): Promise<Project[]> {
+  const supabase = await createServerSupabaseClient();
+  if (!supabase) return [];
+
+  let query = supabase
+    .from("projects")
+    .select(
+      "id, name, slug, status, short_description, description, location, district, city, cover_image, published, featured, sort_order, features, created_at, updated_at",
+    )
+    .eq("published", true)
+    .order("sort_order", { ascending: true })
+    .order("created_at", { ascending: false });
+
+  if (status) query = query.eq("status", status);
+
+  const { data, error } = await query;
+  if (error || !data) return [];
+
+  const rows = data as ProjectRow[];
+  const media = await fetchMedia(rows.map((row) => row.id));
+  return attachMedia(rows, media);
+}
+
+export async function getOngoingProjects() {
+  return getPublishedProjects("ongoing");
+}
+
+export async function getCompletedProjects() {
+  return getPublishedProjects("completed");
+}
+
+export async function getFeaturedProjects(limit = 3) {
+  const supabase = await createServerSupabaseClient();
+  if (!supabase) return [];
+
+  const { data, error } = await supabase
+    .from("projects")
+    .select(
+      "id, name, slug, status, short_description, description, location, district, city, cover_image, published, featured, sort_order, features, created_at, updated_at",
+    )
+    .eq("published", true)
+    .eq("featured", true)
+    .order("sort_order", { ascending: true })
+    .limit(limit);
+
+  if (error || !data) return [];
+  const rows = data as ProjectRow[];
+  const media = await fetchMedia(rows.map((row) => row.id));
+  return attachMedia(rows, media);
+}
+
+export async function getProjectBySlug(
+  slug: string,
+  options?: { includeUnpublished?: boolean },
+): Promise<Project | null> {
+  const supabase = await createServerSupabaseClient();
+  if (!supabase) return null;
+
+  let query = supabase
+    .from("projects")
+    .select(
+      "id, name, slug, status, short_description, description, location, district, city, cover_image, published, featured, sort_order, features, created_at, updated_at",
+    )
+    .eq("slug", slug);
+
+  if (!options?.includeUnpublished) {
+    query = query.eq("published", true);
+  }
+
+  const { data, error } = await query.maybeSingle();
+  if (error || !data) return null;
+
+  const row = data as ProjectRow;
+  const media = await fetchMedia([row.id]);
+  return mapProject(row, media);
+}
+
+export async function getAdminProjects(status?: ProjectStatus): Promise<Project[]> {
+  const supabase = await createServerSupabaseClient();
+  if (!supabase) return [];
+
+  let query = supabase
+    .from("projects")
+    .select(
+      "id, name, slug, status, short_description, description, location, district, city, cover_image, published, featured, sort_order, features, created_at, updated_at",
+    )
+    .order("sort_order", { ascending: true })
+    .order("created_at", { ascending: false });
+
+  if (status) query = query.eq("status", status);
+
+  const { data, error } = await query;
+  if (error || !data) return [];
+
+  const rows = data as ProjectRow[];
+  const media = await fetchMedia(rows.map((row) => row.id));
+  return attachMedia(rows, media);
+}
+
+export async function getAdminProjectById(id: string): Promise<Project | null> {
+  const supabase = await createServerSupabaseClient();
+  if (!supabase) return null;
+
+  const { data, error } = await supabase
+    .from("projects")
+    .select(
+      "id, name, slug, status, short_description, description, location, district, city, cover_image, published, featured, sort_order, features, created_at, updated_at",
+    )
+    .eq("id", id)
+    .maybeSingle();
+
+  if (error || !data) return null;
+  const row = data as ProjectRow;
+  const media = await fetchMedia([row.id]);
+  return mapProject(row, media);
 }

@@ -21,11 +21,15 @@ export function FeaturedProjects({ projects }: FeaturedProjectsProps) {
             Tümünü Gör →
           </Link>
         </div>
-        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-          {projects.map((project) => (
-            <ProjectCard key={project.slug} project={project} />
-          ))}
-        </div>
+        {projects.length === 0 ? (
+          <p className="text-muted">Projelerimiz yakında burada.</p>
+        ) : (
+          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+            {projects.map((project) => (
+              <ProjectCard key={project.slug} project={project} />
+            ))}
+          </div>
+        )}
         <div className="mt-8 text-center sm:hidden">
           <Link
             href="/projeler"

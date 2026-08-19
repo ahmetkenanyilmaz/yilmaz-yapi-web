@@ -11,16 +11,18 @@ export function ProjectCard({ project }: ProjectCardProps) {
   return (
     <Link
       href={`/projeler/${project.slug}`}
-      className="group block overflow-hidden rounded-sm bg-white shadow-sm transition-shadow hover:shadow-md"
+      className="group block overflow-hidden bg-white"
     >
-      <div className="relative aspect-[4/3] overflow-hidden">
-        <Image
-          src={project.image}
-          alt={project.title}
-          fill
-          className="object-cover transition-transform duration-500 group-hover:scale-105"
-          sizes="(max-width: 768px) 100vw, 50vw"
-        />
+      <div className="relative aspect-[4/3] overflow-hidden bg-cream-dark">
+        {project.image ? (
+          <Image
+            src={project.image}
+            alt={project.title}
+            fill
+            className="object-cover transition-transform duration-500 group-hover:scale-105"
+            sizes="(max-width: 768px) 100vw, 50vw"
+          />
+        ) : null}
       </div>
       <div className="flex items-center justify-between px-5 py-4">
         <div>
