@@ -107,7 +107,9 @@ export async function signOutAdmin() {
   redirect("/admin/login");
 }
 
-export async function createProject(formData: FormData) {
+export async function createProject(
+  formData: FormData,
+): Promise<{ error: string } | { id: string; slug: string }> {
   await requireAdmin();
   const supabase = await createServerSupabaseClient();
   if (!supabase) return { error: "Supabase yapılandırılmamış." };
