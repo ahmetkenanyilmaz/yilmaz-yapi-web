@@ -56,8 +56,11 @@ export default async function ProjectDetailPage({ params }: PageProps) {
     (item) => item.type === "video" || item.type === "youtube",
   );
   const featureEntries = (
-    Object.entries(project.features) as [Exclude<keyof ProjectFeatures, "coverFocus">, string | undefined][]
-  ).filter(([, value]) => Boolean(value));
+    Object.entries(project.features) as [keyof ProjectFeatures, string | undefined][]
+  ).filter(([key, value]) => key !== "coverFocus" && Boolean(value)) as [
+    Exclude<keyof ProjectFeatures, "coverFocus">,
+    string,
+  ][];
   const coverFocus = project.features.coverFocus;
 
   return (
