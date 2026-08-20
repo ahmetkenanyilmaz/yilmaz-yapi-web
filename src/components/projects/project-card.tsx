@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import type { Project } from "@/types/project";
+import { coverFocusStyle } from "@/lib/cover-focus";
 import { projectStatusLabels } from "@/types/project";
 
 type ProjectCardProps = {
@@ -20,6 +21,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
             alt={project.title}
             fill
             className="object-cover transition-transform duration-500 group-hover:scale-105"
+            style={coverFocusStyle(project.features.coverFocus)}
             sizes="(max-width: 768px) 100vw, 50vw"
           />
         ) : null}

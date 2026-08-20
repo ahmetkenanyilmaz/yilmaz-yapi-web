@@ -6,7 +6,7 @@ import { requireAdmin } from "@/lib/admin-auth";
 import { slugify } from "@/lib/slugify";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import type { ProjectFeatures, ProjectStatus } from "@/types/project";
-import { PROJECT_STATUSES } from "@/types/project";
+import { normalizeCoverFocus } from "@/lib/cover-focus";
 
 function revalidateProjectPaths(slug?: string) {
   revalidatePath("/insaat/devam-eden");
@@ -25,7 +25,7 @@ function parseStatus(value: FormDataEntryValue | null): ProjectStatus {
   return "ongoing";
 }
 
-function parseFeatures(formData: FormData): ProjectFeatures {
+function parseFeatures(formData: FormData, existing?: ProjectFeatures | null): ProjectFeatures {
   const get = (key: string) => {
     const value = String(formData.get(key) ?? "").trim();
     return value || undefined;
@@ -44,6 +44,7 @@ function parseFeatures(formData: FormData): ProjectFeatures {
     elevator: get("elevator"),
     technicalSpecs: get("technicalSpecs"),
     other: get("other"),
+    coverFocus: existing?.coverFocus,
   };
 }
 
@@ -158,6 +159,12 @@ export async function updateProject(projectId: string, formData: FormData) {
   const requestedSlug = String(formData.get("slug") ?? "").trim();
   const slug = await uniqueSlug(requestedSlug || name, projectId);
 
+  const { data: existing } = await supabase
+    .from("projects")
+    .select("features")
+    .eq("id", projectId)
+    .maybeSingle();
+
   const { error } = await supabase
     .from("projects")
     .update({
@@ -172,7 +179,7 @@ export async function updateProject(projectId: string, formData: FormData) {
       published: formData.get("published") === "on",
       featured: formData.get("featured") === "on",
       sort_order: Number(formData.get("sort_order") ?? 0) || 0,
-      features: parseFeatures(formData),
+      features: parseFeatures(formData, (existing?.features as ProjectFeatures | null) ?? null),
     })
     .eq("id", projectId);
 
@@ -281,6 +288,39 @@ export async function setCoverImage(projectId: string, url: string) {
   const { data, error } = await supabase
     .from("projects")
     .update({ cover_image: url })
+    .eq("id", projectId)
+    .select("slug")
+    .single();
+
+  if (error) return { error: error.message };
+  revalidateProjectPaths(data?.slug);
+  revalidatePath(`/admin/projects/${projectId}/edit`);
+  return { success: true };
+}
+
+export async function updateCoverFocus(projectId: string, coverFocus: string) {
+  await requireAdmin();
+  const supabase = await createServerSupabaseClient();
+  if (!supabase) return { error: "Supabase yapılandırılmamış." };
+
+  const { data: existing, error: readError } = await supabase
+    .from("projects")
+    .select("slug, features")
+    .eq("id", projectId)
+    .maybeSingle();
+
+  if (readError || !existing) {
+    return { error: readError?.message ?? "Proje bulunamadı." };
+  }
+
+  const features = {
+    ...((existing.features as ProjectFeatures | null) ?? {}),
+    coverFocus: normalizeCoverFocus(coverFocus),
+  };
+
+  const { data, error } = await supabase
+    .from("projects")
+    .update({ features })
     .eq("id", projectId)
     .select("slug")
     .single();

@@ -15,6 +15,8 @@ export type ProjectFeatures = {
   elevator?: string;
   technicalSpecs?: string;
   other?: string;
+  /** Kapak/kart kırpımında görünen nokta, örn. "50% 35%" */
+  coverFocus?: string;
 };
 
 export type ProjectMediaItem = {

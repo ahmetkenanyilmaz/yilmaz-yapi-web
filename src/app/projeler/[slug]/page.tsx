@@ -7,6 +7,7 @@ import { ContactBar } from "@/components/layout/contact-bar";
 import { getAdminUser } from "@/lib/admin-auth";
 import { getProjectBySlug } from "@/lib/projects";
 import { siteConfig } from "@/lib/site-config";
+import { coverFocusStyle } from "@/lib/cover-focus";
 import { youtubeIdFromUrl } from "@/lib/slugify";
 import { projectStatusLabels, type ProjectFeatures } from "@/types/project";
 
@@ -56,7 +57,8 @@ export default async function ProjectDetailPage({ params }: PageProps) {
   );
   const featureEntries = (
     Object.entries(project.features) as [keyof ProjectFeatures, string | undefined][]
-  ).filter(([, value]) => Boolean(value));
+  ).filter(([key, value]) => key !== "coverFocus" && Boolean(value));
+  const coverFocus = project.features.coverFocus;
 
   return (
     <SiteLayout currentPath="/projeler">
@@ -67,6 +69,7 @@ export default async function ProjectDetailPage({ params }: PageProps) {
             alt={project.title}
             fill
             className="object-cover"
+            style={coverFocusStyle(coverFocus)}
             priority
             sizes="100vw"
           />
@@ -103,17 +106,17 @@ export default async function ProjectDetailPage({ params }: PageProps) {
             {gallery.length > 0 && (
               <div className="mt-12">
                 <h2 className="font-serif text-2xl text-charcoal">Galeri</h2>
-                <div className="mt-6 grid gap-4 sm:grid-cols-2">
+                <div className="mt-6 grid gap-6 sm:grid-cols-2">
                   {gallery.map((item) => (
-                    <div key={item.id} className="relative aspect-[4/3] overflow-hidden bg-cream-dark">
-                      <Image
+                    <figure key={item.id} className="overflow-hidden bg-cream-dark">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
                         src={item.url}
                         alt={item.title || project.title}
-                        fill
-                        className="object-cover"
-                        sizes="(max-width: 768px) 100vw, 50vw"
+                        className="block h-auto w-full"
+                        loading="lazy"
                       />
-                    </div>
+                    </figure>
                   ))}
                 </div>
               </div>

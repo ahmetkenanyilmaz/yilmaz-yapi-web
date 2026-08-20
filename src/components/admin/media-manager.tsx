@@ -2,13 +2,14 @@
 
 import { useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { deleteMedia, reorderMedia, setCoverImage } from "@/app/admin/actions";
+import { deleteMedia, reorderMedia, setCoverImage, updateCoverFocus } from "@/app/admin/actions";
 import {
   formatFileSize,
   MAX_GALLERY_IMAGES,
   MAX_VIDEO_BYTES,
   uploadProjectFile,
 } from "@/lib/admin-upload";
+import { coverFocusStyle, normalizeCoverFocus } from "@/lib/cover-focus";
 import type { Project, ProjectMediaItem } from "@/types/project";
 
 type MediaManagerProps = {
@@ -40,26 +41,14 @@ function CoverUploader({ project }: { project: Project }) {
   const [preview, setPreview] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
+  const coverUrl = preview || project.image;
+  const coverFocus = normalizeCoverFocus(project.features.coverFocus);
 
   return (
     <div>
       <h2 className="font-serif text-xl text-charcoal">Kapak görseli</h2>
-      <div className="mt-4 flex flex-col gap-4 sm:flex-row sm:items-start">
-        <div className="relative h-40 w-full overflow-hidden bg-cream-dark sm:w-64">
-          {preview || project.image ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={preview || project.image || ""}
-              alt=""
-              className="h-full w-full object-cover"
-            />
-          ) : (
-            <div className="flex h-full items-center justify-center text-xs text-muted">
-              Kapak yok
-            </div>
-          )}
-        </div>
-        <div>
+      <div className="mt-4 flex flex-col gap-6 lg:flex-row lg:items-start">
+        <div className="w-full max-w-xl">
           <label className="flex cursor-pointer items-center justify-between gap-3 border border-cream-dark bg-cream px-4 py-3 text-sm text-charcoal hover:border-[#b8934a]">
             <span>{pending ? "Yükleniyor..." : "Kapak fotoğrafı seç"}</span>
             <span className="shrink-0 text-xs font-semibold uppercase tracking-wider text-[#b8934a]">
@@ -71,23 +60,23 @@ function CoverUploader({ project }: { project: Project }) {
               disabled={pending}
               className="sr-only"
               onChange={(event) => {
-              const file = event.target.files?.[0];
-              if (!file) return;
-              setPreview(URL.createObjectURL(file));
-              setError(null);
-              startTransition(async () => {
-                const result = await uploadProjectFile({
-                  file,
-                  slug: project.slug,
-                  folder: "cover",
-                  projectId: project.id,
-                  type: "image",
-                  setAsCover: true,
+                const file = event.target.files?.[0];
+                if (!file) return;
+                setPreview(URL.createObjectURL(file));
+                setError(null);
+                startTransition(async () => {
+                  const result = await uploadProjectFile({
+                    file,
+                    slug: project.slug,
+                    folder: "cover",
+                    projectId: project.id,
+                    type: "image",
+                    setAsCover: true,
+                  });
+                  if (result.error) setError(result.error);
+                  else router.refresh();
                 });
-                if (result.error) setError(result.error);
-                else router.refresh();
-              });
-            }}
+              }}
             />
           </label>
           <p className="mt-2 text-xs text-muted">
@@ -96,7 +85,85 @@ function CoverUploader({ project }: { project: Project }) {
           {pending && <p className="mt-2 text-xs text-muted">Yükleniyor...</p>}
           {error && <p className="mt-2 text-xs text-red-700">{error}</p>}
         </div>
+
+        {coverUrl ? (
+          <CoverFocusPicker
+            projectId={project.id}
+            imageUrl={coverUrl}
+            focus={coverFocus}
+            onSaved={() => router.refresh()}
+          />
+        ) : (
+          <div className="flex h-40 w-full max-w-xl items-center justify-center border border-cream-dark bg-cream-dark text-xs text-muted">
+            Kapak yok
+          </div>
+        )}
       </div>
+    </div>
+  );
+}
+
+function CoverFocusPicker({
+  projectId,
+  imageUrl,
+  focus,
+  onSaved,
+}: {
+  projectId: string;
+  imageUrl: string;
+  focus: string;
+  onSaved: () => void;
+}) {
+  const [currentFocus, setCurrentFocus] = useState(focus);
+  const [pending, startTransition] = useTransition();
+  const [parseX, parseY] = currentFocus.replace(/%/g, "").split(/\s+/).map(Number);
+  const markerX = Number.isFinite(parseX) ? parseX : 50;
+  const markerY = Number.isFinite(parseY) ? parseY : 50;
+
+  useEffect(() => {
+    setCurrentFocus(focus);
+  }, [focus, imageUrl]);
+
+  return (
+    <div className="w-full max-w-xl">
+      <p className="text-sm font-medium text-charcoal">Kapak kırpım noktası</p>
+      <p className="mt-1 text-xs text-muted">
+        Üst banner geniş ekranda kırpılır. Görünmesini istediğiniz yere tıklayın — sitedeki
+        önizleme aşağıdaki gibi olur.
+      </p>
+      <button
+        type="button"
+        disabled={pending}
+        className="relative mt-3 aspect-[2/1] w-full overflow-hidden bg-cream-dark"
+        onClick={(event) => {
+          const rect = event.currentTarget.getBoundingClientRect();
+          const x = Math.round(((event.clientX - rect.left) / rect.width) * 100);
+          const y = Math.round(((event.clientY - rect.top) / rect.height) * 100);
+          const next = `${x}% ${y}%`;
+          setCurrentFocus(next);
+          startTransition(async () => {
+            await updateCoverFocus(projectId, next);
+            onSaved();
+          });
+        }}
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={imageUrl}
+          alt=""
+          className="h-full w-full object-cover"
+          style={coverFocusStyle(currentFocus)}
+        />
+        <span
+          aria-hidden
+          className="pointer-events-none absolute h-4 w-4 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white bg-[#b8934a] shadow"
+          style={{ left: `${markerX}%`, top: `${markerY}%` }}
+        />
+      </button>
+      <p className="mt-2 text-xs text-muted">
+        Seçili nokta: {currentFocus}
+        {pending ? " · Kaydediliyor..." : ""}
+      </p>
     </div>
   );
 }
@@ -209,7 +276,7 @@ function GalleryManager({
             className="border border-cream-dark bg-white"
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={item.url} alt="" className="h-28 w-full object-cover" />
+            <img src={item.url} alt="" className="block h-auto w-full bg-cream-dark" />
             <div className="flex flex-wrap gap-2 px-2 py-2 text-[11px]">
               {coverUrl === item.url ? (
                 <span className="text-[#b8934a]">Kapak</span>
