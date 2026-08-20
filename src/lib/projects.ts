@@ -1,5 +1,6 @@
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { mapProject, type MediaRow, type ProjectRow } from "@/lib/project-mappers";
+import { sortProjectsForDisplay } from "@/lib/project-sort";
 import type { Project, ProjectStatus } from "@/types/project";
 
 async function fetchMedia(projectIds: string[]) {
@@ -48,7 +49,7 @@ export async function getPublishedProjects(status?: ProjectStatus): Promise<Proj
 
   const rows = data as ProjectRow[];
   const media = await fetchMedia(rows.map((row) => row.id));
-  return attachMedia(rows, media);
+  return sortProjectsForDisplay(attachMedia(rows, media));
 }
 
 export async function getOngoingProjects() {
@@ -76,7 +77,7 @@ export async function getFeaturedProjects(limit = 3) {
   if (error || !data) return [];
   const rows = data as ProjectRow[];
   const media = await fetchMedia(rows.map((row) => row.id));
-  return attachMedia(rows, media);
+  return sortProjectsForDisplay(attachMedia(rows, media));
 }
 
 export async function getProjectBySlug(
@@ -124,7 +125,7 @@ export async function getAdminProjects(status?: ProjectStatus): Promise<Project[
 
   const rows = data as ProjectRow[];
   const media = await fetchMedia(rows.map((row) => row.id));
-  return attachMedia(rows, media);
+  return sortProjectsForDisplay(attachMedia(rows, media));
 }
 
 export async function getAdminProjectById(id: string): Promise<Project | null> {

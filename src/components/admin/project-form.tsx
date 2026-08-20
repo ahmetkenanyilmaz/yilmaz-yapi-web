@@ -131,13 +131,16 @@ export function ProjectForm({ project }: ProjectFormProps) {
             <input name="city" defaultValue={project?.city ?? "İstanbul"} className={fieldClass} />
           </label>
           <label>
-            <span className="text-sm text-charcoal">Sıra</span>
+            <span className="text-sm text-charcoal">Liste sırası</span>
             <input
               name="sort_order"
               type="number"
               defaultValue={project?.sortOrder ?? 0}
               className={fieldClass}
             />
+            <span className="mt-1 block text-xs text-muted">
+              Devam Eden / Tamamlanan sayfalarında sıralama. Küçük sayı üstte (0 = en başta).
+            </span>
           </label>
           <label className="sm:col-span-2">
             <span className="text-sm text-charcoal">Kısa Açıklama</span>
@@ -173,7 +176,7 @@ export function ProjectForm({ project }: ProjectFormProps) {
               name="featured"
               defaultChecked={project?.featured}
             />
-            Öne çıkan proje
+            Öne çıkan (listedeki diğer projelerin üstünde göster)
           </label>
         </div>
       </section>
