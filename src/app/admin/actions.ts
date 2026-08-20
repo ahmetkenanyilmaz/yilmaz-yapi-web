@@ -6,6 +6,7 @@ import { requireAdmin } from "@/lib/admin-auth";
 import { slugify } from "@/lib/slugify";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import type { ProjectFeatures, ProjectStatus } from "@/types/project";
+import { PROJECT_STATUSES } from "@/types/project";
 import { normalizeCoverFocus } from "@/lib/cover-focus";
 
 function revalidateProjectPaths(slug?: string) {

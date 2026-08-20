@@ -17,7 +17,7 @@ type PageProps = {
 
 export const dynamic = "force-dynamic";
 
-const featureLabels: Record<keyof ProjectFeatures, string> = {
+const featureLabels: Record<Exclude<keyof ProjectFeatures, "coverFocus">, string> = {
   projectType: "Proje Türü",
   constructionYear: "Yapım Yılı",
   deliveryDate: "Teslim Tarihi",
@@ -56,8 +56,8 @@ export default async function ProjectDetailPage({ params }: PageProps) {
     (item) => item.type === "video" || item.type === "youtube",
   );
   const featureEntries = (
-    Object.entries(project.features) as [keyof ProjectFeatures, string | undefined][]
-  ).filter(([key, value]) => key !== "coverFocus" && Boolean(value));
+    Object.entries(project.features) as [Exclude<keyof ProjectFeatures, "coverFocus">, string | undefined][]
+  ).filter(([, value]) => Boolean(value));
   const coverFocus = project.features.coverFocus;
 
   return (
