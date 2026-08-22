@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Cormorant_Garamond, Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
+import { GoogleAnalytics } from "@/components/analytics/google-analytics";
 import { siteConfig } from "@/lib/site-config";
 
 const inter = Inter({
@@ -61,7 +62,10 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="tr" className={`${inter.variable} ${playfair.variable} ${cormorant.variable} h-full`}>
-      <body className="flex min-h-full flex-col bg-[#f8f6f2] antialiased">{children}</body>
+      <body className="flex min-h-full flex-col bg-[#f8f6f2] antialiased">
+        {children}
+        <GoogleAnalytics />
+      </body>
     </html>
   );
 }
