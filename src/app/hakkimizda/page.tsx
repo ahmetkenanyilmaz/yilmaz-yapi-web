@@ -1,12 +1,13 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 import { SiteLayout } from "@/components/layout/site-layout";
+import { createPageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata = createPageMetadata({
   title: "Hakkımızda",
   description:
     "1977 yılında başlayan ticari faaliyet ve üretim tecrübemizi, 12 yıllık inşaat deneyimimizle birleştirerek güvenli, nitelikli ve değer kazanan yaşam alanları inşa ediyoruz.",
-};
+  path: "/hakkimizda",
+});
 
 const stats = [
   { value: "1977", label: "Üretim ve ticari faaliyetlerde başlayan tecrübe" },

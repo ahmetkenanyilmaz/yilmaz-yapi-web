@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Cormorant_Garamond, Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import { GoogleAnalytics } from "@/components/analytics/google-analytics";
+import { SiteJsonLd } from "@/components/seo/json-ld";
 import { siteConfig } from "@/lib/site-config";
 
 const inter = Inter({
@@ -37,9 +38,6 @@ export const metadata: Metadata = {
   },
   description: siteConfig.description,
   applicationName: siteConfig.name,
-  alternates: {
-    canonical: "/",
-  },
   openGraph: {
     type: "website",
     locale: "tr_TR",
@@ -63,6 +61,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="tr" className={`${inter.variable} ${playfair.variable} ${cormorant.variable} h-full`}>
       <body className="flex min-h-full flex-col bg-[#f8f6f2] antialiased">
+        <SiteJsonLd />
         {children}
         <GoogleAnalytics />
       </body>

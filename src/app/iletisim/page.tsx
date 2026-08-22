@@ -1,11 +1,14 @@
-import type { Metadata } from "next";
 import { SiteLayout } from "@/components/layout/site-layout";
 import { ContactForm } from "@/components/contact/contact-form";
+import { createPageMetadata } from "@/lib/seo";
 import { siteConfig } from "@/lib/site-config";
 
-export const metadata: Metadata = {
-  title: "İletişim",
-};
+export const metadata = createPageMetadata({
+  title: "İletişim ve Adres",
+  description:
+    "Yılmaz Yapı iletişim bilgileri: Şirinevler Yakut 2 Sk No 1, Bahçelievler ofis adresi, telefon, WhatsApp ve e-posta.",
+  path: "/iletisim",
+});
 
 const iconCircle =
   "flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-charcoal text-white transition-[background] duration-[250ms] ease-in-out";
@@ -18,8 +21,12 @@ export default function IletisimPage() {
       <section className="bg-cream py-12 sm:py-16">
         <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
           <h1 className="text-center font-serif text-2xl font-semibold uppercase tracking-wide text-charcoal sm:text-3xl">
-            Yeni Bir Yaşam İçin Bize Ulaşın
+            İletişim
           </h1>
+          <p className="mt-3 text-center text-sm text-muted">
+            Yeni bir yaşam için bize ulaşın — ofis adresimiz ve iletişim
+            kanallarımız aşağıdadır.
+          </p>
 
           <div className="mt-12 grid gap-12 border-t border-[#ede9e1] pt-10 lg:grid-cols-2 lg:items-start lg:gap-16">
             <div>
@@ -136,6 +143,16 @@ export default function IletisimPage() {
               allowFullScreen
             />
           </div>
+          <p className="mt-3 text-center">
+            <a
+              href={siteConfig.address.mapsLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm font-medium text-gold hover:underline"
+            >
+              Google Haritalar&apos;da aç →
+            </a>
+          </p>
         </div>
       </section>
     </SiteLayout>

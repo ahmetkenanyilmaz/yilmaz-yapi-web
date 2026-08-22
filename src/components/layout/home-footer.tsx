@@ -19,7 +19,13 @@ export function HomeFooter() {
           <Link href="/kvkk" className="hover:text-gold">
             KVKK
           </Link>
+          <Link href="/iletisim" className="hover:text-gold">
+            İletişim
+          </Link>
         </div>
+        <p className="text-center text-[11px] text-muted">
+          {siteConfig.address.line1} · {siteConfig.phones[0].number}
+        </p>
         <p className="text-center text-[11px] text-muted">
           © {year} {siteConfig.name} — Tüm Hakları Saklıdır.
         </p>

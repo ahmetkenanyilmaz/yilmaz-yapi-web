@@ -9,21 +9,33 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const lastModified = new Date();
 
   const pages: MetadataRoute.Sitemap = [
-    "",
-    "/hakkimizda",
-    "/insaat/devam-eden",
-    "/insaat/tamamlanan",
-    "/kentsel-donusum",
-    "/iletisim",
-    "/kvkk",
-    "/gizlilik",
-    "/site-haritasi",
-  ].map((path) => ({
-    url: `${siteConfig.url}${path || "/"}`,
-    lastModified,
-    changeFrequency: path === "" ? "weekly" : "monthly",
-    priority: path === "" ? 1 : 0.7,
-  }));
+    {
+      url: siteConfig.url,
+      lastModified,
+      changeFrequency: "weekly",
+      priority: 1,
+    },
+    ...["/hakkimizda", "/insaat/devam-eden", "/insaat/tamamlanan", "/kentsel-donusum"].map(
+      (path) => ({
+        url: `${siteConfig.url}${path}`,
+        lastModified,
+        changeFrequency: "monthly" as const,
+        priority: 0.8,
+      }),
+    ),
+    {
+      url: `${siteConfig.url}/iletisim`,
+      lastModified,
+      changeFrequency: "monthly",
+      priority: 0.5,
+    },
+    ...["/kvkk", "/gizlilik", "/site-haritasi"].map((path) => ({
+      url: `${siteConfig.url}${path}`,
+      lastModified,
+      changeFrequency: "monthly" as const,
+      priority: 0.4,
+    })),
+  ];
 
   const projectPages: MetadataRoute.Sitemap = projects.map((project) => ({
     url: `${siteConfig.url}/projeler/${project.slug}`,

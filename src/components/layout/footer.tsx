@@ -11,6 +11,17 @@ export function Footer() {
         <div className="flex flex-col items-center gap-4 md:items-start">
           <Logo variant="footer" />
           <p className="text-sm text-muted">
+            {siteConfig.address.line1}
+            <br />
+            {siteConfig.address.line2}
+          </p>
+          <a
+            href={siteConfig.phones[0].href}
+            className="text-sm text-muted hover:text-gold"
+          >
+            {siteConfig.phones[0].number}
+          </a>
+          <p className="text-sm text-muted">
             © {year} {siteConfig.name} — Tüm Hakları Saklıdır.
           </p>
           <p className="max-w-sm text-center text-[11px] leading-relaxed text-muted/80 md:text-left">

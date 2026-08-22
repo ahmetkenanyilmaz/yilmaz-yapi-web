@@ -1,16 +1,17 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 import { SiteLayout } from "@/components/layout/site-layout";
 import { UrbanFaq } from "@/components/urban/urban-faq";
 import { UrbanGuideToc } from "@/components/urban/urban-guide-toc";
 import { UrbanStateSupports } from "@/components/urban/urban-state-supports";
+import { createPageMetadata } from "@/lib/seo";
 import { siteConfig } from "@/lib/site-config";
 
-export const metadata: Metadata = {
+export const metadata = createPageMetadata({
   title: "Kentsel Dönüşüm",
   description:
     "Kentsel dönüşüm nedir, süreç nasıl işler, hak sahipleri ve kiracılar nelere dikkat etmeli? 6306 sayılı Kanun çerçevesinde anlaşılır bir rehber.",
-};
+  path: "/kentsel-donusum",
+});
 
 const reasons = [
   {
